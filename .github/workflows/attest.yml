@@ -1,0 +1,25 @@
+name: Codex Attestation Proof
+on:
+  workflow_dispatch:
+  push:
+permissions:
+  contents: read
+  id-token: write
+  attestations: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create artifact
+        run: |
+          printf "codex owned attestation proof from %s\\n" "${GITHUB_REPOSITORY}" > artifact.txt
+          sha256sum artifact.txt
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: codex-proof-artifact
+          path: artifact.txt
+      - name: Attest artifact
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: artifact.txt
